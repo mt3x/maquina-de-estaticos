@@ -26,7 +26,7 @@ O resto (Node, Python, Chrome, Git) o Claude instala para você, sempre pedindo 
 
 O endereço é **https://github.com/mt3x/maquina-de-estaticos** e já vem pronto na frase do passo 2. Se quiser pegar direto no GitHub: botão verde **Code** → **HTTPS** → copiar.
 
-![No GitHub: botão Code, aba HTTPS e o botão de copiar](docs/imagens/ilustracao-github-code.png)
+![Print do GitHub: 1 botão verde Code, 2 aba HTTPS, 3 botão de copiar o endereço](docs/imagens/github-code.png)
 
 ### 2. Peça ao Claude para instalar
 

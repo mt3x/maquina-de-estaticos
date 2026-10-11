@@ -1,15 +1,17 @@
 // Gera as imagens do README em docs/imagens/ (PNG ~1200 px, otimizado).
 //  1. ilustrações: HTML desta pasta renderizado pelo Chromium do Playwright (headless);
-//  2. prints do app: dados de demonstração (demo.mjs) numa pasta temporária + só o servidor web (`next start`).
+//  2. print real do GitHub (github-print.mjs, precisa de internet; só com --so-github ou sem flag);
+//  3. prints do app: dados de demonstração (demo.mjs) numa pasta temporária + só o servidor web (`next start`).
 // SEGURANÇA: nunca roda o worker nem toca no Flow. O "Chrome no ar" é um servidor falso que só responde /json/version
 // e o "worker vivo" é um worker.json reescrito a cada 3 s. Nunca abre o Chrome da pessoa.
-// Pré-requisito: `npm run build`. Uso: node scripts/imagens-readme/capturar.mjs [--so-ilustracoes | --so-app] [pasta-temporaria]
+// Pré-requisito: `npm run build`. Uso: node scripts/imagens-readme/capturar.mjs [--so-ilustracoes | --so-app | --so-github] [pasta-temporaria]
 import fs from "node:fs"; import os from "node:os"; import path from "node:path"; import http from "node:http";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { chromium } from "playwright-core";
 import sharp from "sharp";
 import { montarDemo } from "./demo.mjs";
+import { printGithub } from "./github-print.mjs";
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url)); const RAIZ = path.resolve(AQUI, "..", "..");
 const SAIDA = path.join(RAIZ, "docs", "imagens");
@@ -17,7 +19,7 @@ const args = process.argv.slice(2); const so = args.find((a) => a.startsWith("--
 const PORTA_WEB = 3200, PORTA_CHROME = 9333, PROJETO = "0f1e2d3c-4b5a-6978-8a9b-0c1d2e3f4a5b";
 const LARGURA = 1200;
 
-const ILUSTRACOES = ["github-code", "claude-frase", "claude-permissao", "login-google", "flow-novo-projeto", "flow-link", "claude-inicia"];
+const ILUSTRACOES = ["claude-frase", "claude-permissao", "login-google", "flow-novo-projeto", "flow-link", "claude-inicia"];
 
 async function salvar(buf, nome) {
   fs.mkdirSync(SAIDA, { recursive: true });
@@ -106,8 +108,10 @@ function acharChromium() {
       for (const r of rel) { const a = path.join(c, d, ...r); if (fs.existsSync(a)) return a; } }
   return undefined; // deixa o Playwright procurar sozinho
 }
+if (so === "--so-github") { await printGithub(); process.exit(0); }
 const nav = await chromium.launch({ headless: true, executablePath: acharChromium() });
 try {
   if (so !== "--so-app") await ilustracoes(nav);
+  if (!so) await printGithub();
   if (so !== "--so-ilustracoes") await prints(nav);
 } finally { await nav.close(); }
