@@ -1,0 +1,27 @@
+TASK: Recreate the advertisement in IMAGE 1 (reference) for the Grão Norte brand, keeping EXACTLY the same wireframe: light background with a large soft circle at the top right, logo top-left, headline + price block on the left, one-line description, a white rounded card with the offer content, dark full-width button inside the card, small legal text at the bottom. IMAGE 2 is the Grão Norte logo.
+
+ELEMENT MAPPING (reference -> new):
+- Background light grey + lilac circle -> cream #F4EDE1 + soft circle in amber #E3A33B at low opacity (about 25%).
+- Reference logo (top-left) -> Grão Norte logo from IMAGE 2 (graphite with amber bean), same position and size.
+- "OFERTA EXCLUSIVA" (top right) -> removed.
+- Headline "Planos de academia" -> "Assinatura de café especial"
+- "a partir de" -> "A partir de"
+- Price "R$ 119/mês" -> "R$59,90" with small "/mês", same style, pine green #2F5D50.
+- Small description line -> "Dois pacotes por mês, torrados na semana da entrega."
+- White card content (plan name, thumbnail, 15% OFF, old price, installments) -> replaced by a clean checklist of 4 items, each with a pine green #2F5D50 circle with a cream check, same card size:
+  "Grãos de produtores do Sul de Minas" · "Moagem do jeito que você prepara" · "Entrega grátis na sua cidade" · "Cancele quando quiser"
+- Dark button "QUERO COMEÇAR AGORA" -> graphite #1B1B1B button, same width and height, with cream #F4EDE1 text "QUERO MEU CAFÉ TODO MÊS".
+
+BRAND IDENTITY (Grão Norte) — apply to every brand element:
+- Official colors: pine green #2F5D50 (main UI color), cream #F4EDE1, graphite #1B1B1B, amber #E3A33B (sparing accent only).
+- Typography: Fraunces (soft-contrast serif) SemiBold for the headline and the price; Inter (sans-serif) for ALL other texts: semibold uppercase for the button, regular for body and checklist. Do NOT copy the reference's fonts.
+- Logo: use ONLY the "Grão Norte" wordmark exactly as in IMAGE 2 (graphite letters with an amber coffee bean on light backgrounds; all cream on dark or green backgrounds). Never invent, redraw, stylize or add any other logo, icon-logo or symbol, and never typeset "GRÃO NORTE" as a logo.
+
+LEGAL TEXT (mandatory): place this exact paragraph small, discreet and fully legible (low-emphasis warm grey #7D766C on the cream background), centered, in the same position as the reference's legal text, never covering the card, the price or the button. Every word exactly as written:
+"Imagens meramente ilustrativas. Ofertas válidas enquanto durarem os estoques, nas unidades participantes. Consulte condições em graonorte.exemplo."
+
+LANGUAGE: every text in the image is in Brazilian Portuguese exactly as given. NEVER translate anything to English.
+
+RULES: Keep the reference's wireframe: same composition, element positions, proportions, text hierarchy and font sizes — each new text goes in the slot of the text it replaces, with the same size, weight, case and alignment. Spell every Portuguese text exactly as given, with all accents. Do not add any text, badges, prices, numbers or words beyond those listed, and do not drop any listed text. No third-party logos, no disposable cups, no spilled coffee. Photorealistic, premium ad quality.
+
+FORMAT: vertical 9:16 Instagram Story. Keep all important content between 13% and 86% of the height.

@@ -1,0 +1,11 @@
+# Regras aprendidas (valem para todas as tarefas)
+- O texto da arte é SEMPRE a copy literal do usuário. Nada é inventado. Peça da referência sem texto correspondente na copy é REMOVIDA — exceção: fitas "ÚLTIMOS DIAS" e abas "POR TEMPO LIMITADO" quando a referência tem e a instrução/usuário autorizou.
+- Nunca traduzir. Todo texto em português do Brasil com acentos.
+- Não copiar a fonte da referência: usar a família da marca (identidade.json → tipografia.principal).
+- Logo: só o arquivo da marca (marca:logo/logo-cor.png). Nunca inventar ícone-logo, nunca escrever o nome da marca como logo.
+- Aviso legal oficial (identidade.json → aviso_legal.texto) literal, completo, incluindo "e/ou", na posição do texto legal da referência. Depois da geração o sistema reescreve esse parágrafo por código com o texto exato (a IA erra letras), então ele deve ficar num bloco limpo de letra pequena, sobre fundo calmo, sem encostar em fitas, bordas ou outros textos.
+- Foto enviada pelo usuário (material de apoio): instruir "use IMAGE N unchanged".
+- Pessoas: fotografia realista e crível; quando a referência é casual, estilo "foto tirada com iPhone 17 Pro Max", sem fotógrafo/celular aparecendo.
+- Produtos reais NÃO são compostos na cena (ficam falsos); só se o usuário pedir explicitamente com foto do produto, e ainda assim descrever "small and discreet".
+- Quando a referência tem texto direto sobre a foto: "no panels, no boxes, no bands behind the text".
+- Prompts de imagem em INGLÊS (as copies dentro deles em português, entre aspas).

@@ -1,0 +1,287 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* === MAL SEMANTIC COLORS === */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-kill: var(--kill);
+  --color-kill-foreground: var(--kill-foreground);
+
+  /* === MAL RAW TOKENS (utility classes) === */
+  --color-bg-0: var(--bg-0);
+  --color-bg-1: var(--bg-1);
+  --color-bg-2: var(--bg-2);
+  --color-rule: var(--rule);
+  --color-ink-0: var(--ink-0);
+  --color-ink-1: var(--ink-1);
+  --color-ink-2: var(--ink-2);
+  --color-brand: var(--brand);
+  --color-brand-hot: var(--brand-hot);
+  --color-win: var(--win);
+  --color-warn: var(--warn-color);
+  --color-neutral-state: var(--neutral-state);
+
+  /* === FONTES — Inter na interface e nos títulos; mono só para dados técnicos === */
+  --font-sans: var(--font-inter);
+    --font-mono: var(--font-jetbrains-mono);
+  --font-heading: var(--font-inter);
+
+  /* === RADIUS === */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 2.5);
+  --radius-4xl: calc(var(--radius) * 3);
+
+  /* === MOTION — organic, never theatrical ===
+   * Easing mimics physical settling, not machine snapping.
+   * "Life" animation (breathe) is reserved for REAL activity only.
+   */
+  --ease-organic: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-breathe: breathe 2.4s var(--ease-organic) infinite;
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+/*
+ * Máquina de Estáticos — "Vidro"
+ *
+ * Painéis translúcidos (vidro) sobre um fundo com manchas suaves de cor.
+ * Claro: off-white #F9F9F9 com manchas verdes. Escuro: quase-preto com manchas roxa e azul.
+ * --bg-1 é o vidro dos painéis (use a classe .vidro, que soma desfoque e sombra);
+ * --bg-2 é o vidro mais opaco (hover, elementos sobre painéis).
+ */
+
+:root {
+  --bg-0: #f9f9f9;
+  --bg-1: rgba(255, 255, 255, 0.62);
+  --bg-2: rgba(255, 255, 255, 0.92);
+  --rule: rgba(17, 17, 17, 0.08);
+  --ink-0: #1d1d1f;
+  --ink-1: #5f5f66;
+  --ink-2: #77777e;
+  --brand: #1d1d1f;
+  --brand-hot: #000000;
+  --win: #00a347;
+  --kill: #d92d20;
+  --warn-color: #b25e09;
+  --neutral-state: #0a6cdb;
+
+  --mancha-1: rgba(0, 184, 78, 0.13);
+  --mancha-2: rgba(0, 184, 78, 0.1);
+  --borda-vidro: rgba(255, 255, 255, 0.95);
+  --sombra-vidro: 0 1px 2px rgba(0, 0, 0, 0.03), 0 10px 30px rgba(0, 0, 0, 0.05);
+  --progresso: #00b84e;
+  --beam-de: #00b84e;
+  --beam-para: #9be7b6;
+  --spot: rgba(0, 184, 78, 0.08);
+
+  --background: var(--bg-0);
+  --foreground: var(--ink-0);
+  --card: var(--bg-1);
+  --card-foreground: var(--ink-0);
+  --popover: rgba(255, 255, 255, 0.88);
+  --popover-foreground: var(--ink-0);
+  --primary: var(--brand);
+  --primary-foreground: #f9f9f9;
+  --secondary: rgba(17, 17, 17, 0.05);
+  --secondary-foreground: var(--ink-0);
+  --muted: rgba(17, 17, 17, 0.05);
+  --muted-foreground: var(--ink-1);
+  --accent: rgba(17, 17, 17, 0.06);
+  --accent-foreground: var(--ink-0);
+  --destructive: var(--kill);
+  --destructive-foreground: #ffffff;
+  --border: var(--rule);
+  --input: rgba(17, 17, 17, 0.12);
+  --ring: #0a84ff;
+
+  --radius: 0.875rem;
+
+  --chart-1: #00b84e;
+  --chart-2: #0a84ff;
+  --chart-3: #b25e09;
+  --chart-4: #5f5f66;
+  --chart-5: #d92d20;
+
+  --sidebar: var(--bg-1);
+  --sidebar-foreground: var(--ink-0);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: #f9f9f9;
+  --sidebar-accent: var(--bg-2);
+  --sidebar-accent-foreground: var(--ink-0);
+  --sidebar-border: var(--rule);
+  --sidebar-ring: #0a84ff;
+
+  --success: var(--win);
+  --success-foreground: #ffffff;
+  --warning: var(--warn-color);
+  --warning-foreground: #ffffff;
+  --info: var(--neutral-state);
+  --info-foreground: #ffffff;
+  --kill-foreground: #ffffff;
+}
+
+.dark {
+  --bg-0: #0b0b12;
+  --bg-1: rgba(255, 255, 255, 0.06);
+  --bg-2: rgba(255, 255, 255, 0.11);
+  --rule: rgba(255, 255, 255, 0.12);
+  --ink-0: #f5f5f7;
+  --ink-1: #a9a9b3;
+  --ink-2: #8c8c97;
+  --brand: #f5f5f7;
+  --brand-hot: #ffffff;
+  --win: #30d158;
+  --kill: #ff6961;
+  --warn-color: #ffb340;
+  --neutral-state: #64a8ff;
+
+  --mancha-1: rgba(108, 56, 170, 0.45);
+  --mancha-2: rgba(20, 92, 150, 0.45);
+  --borda-vidro: rgba(255, 255, 255, 0.12);
+  --sombra-vidro: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0, 0, 0, 0.25);
+  --progresso: #f5f5f7;
+  --beam-de: #a78bfa;
+  --beam-para: #60a5fa;
+  --spot: rgba(167, 139, 250, 0.12);
+
+  --background: var(--bg-0);
+  --foreground: var(--ink-0);
+  --card: var(--bg-1);
+  --card-foreground: var(--ink-0);
+  --popover: rgba(28, 28, 38, 0.88);
+  --popover-foreground: var(--ink-0);
+  --primary: var(--brand);
+  --primary-foreground: #0b0b12;
+  --secondary: rgba(255, 255, 255, 0.08);
+  --secondary-foreground: var(--ink-0);
+  --muted: rgba(255, 255, 255, 0.08);
+  --muted-foreground: var(--ink-1);
+  --accent: rgba(255, 255, 255, 0.1);
+  --accent-foreground: var(--ink-0);
+  --destructive: var(--kill);
+  --destructive-foreground: #0b0b12;
+  --border: var(--rule);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: #64a8ff;
+
+  --chart-1: #30d158;
+  --chart-2: #64a8ff;
+  --chart-3: #ffb340;
+  --chart-4: #a9a9b3;
+  --chart-5: #ff6961;
+
+  --sidebar: var(--bg-1);
+  --sidebar-foreground: var(--ink-0);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: #0b0b12;
+  --sidebar-accent: var(--bg-2);
+  --sidebar-accent-foreground: var(--ink-0);
+  --sidebar-border: var(--rule);
+  --sidebar-ring: #64a8ff;
+
+  --success: var(--win);
+  --success-foreground: #0b0b12;
+  --warning: var(--warn-color);
+  --warning-foreground: #0b0b12;
+  --info: var(--neutral-state);
+  --info-foreground: #0b0b12;
+  --kill-foreground: #0b0b12;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--progresso) 28%, transparent);
+  }
+  h1, h2, h3, .font-heading {
+    letter-spacing: -0.022em;
+  }
+  /* menus, janelas e painéis laterais do shadcn também são vidro */
+  [data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="popover-content"], [data-slot="tooltip-content"] {
+    -webkit-backdrop-filter: blur(28px) saturate(170%);
+    backdrop-filter: blur(28px) saturate(170%);
+  }
+}
+
+/* Painel de vidro: fundo translúcido + desfoque + borda clara + sombra suave. */
+@utility vidro {
+  background-color: var(--bg-1);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  backdrop-filter: blur(22px) saturate(170%);
+  border-color: var(--borda-vidro);
+  box-shadow: var(--sombra-vidro);
+}
+
+@layer utilities {
+  /*
+   * Editorial measure — where the user THINKS, the screen is a document.
+   * ~68 characters per line, book-like leading.
+   */
+  .prose-measure {
+    max-width: 68ch;
+    line-height: 1.7;
+  }
+}

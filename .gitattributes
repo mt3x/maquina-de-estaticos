@@ -1,0 +1,10 @@
+# Fins de linha LF em todo o projeto (inclusive no checkout do Windows); binários nunca são convertidos.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ttf binary
+*.otf binary
+*.docx binary
+*.zip binary

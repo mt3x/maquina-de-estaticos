@@ -1,0 +1,16 @@
+node_modules/
+.next/
+.env*.local
+.venv/
+dados/*
+!dados/.gitkeep
+producao/
+testes/
+motor-flow/erro-*.png
+*.suspeito
+.DS_Store
+.superpowers/
+.gstack/
+tsconfig.tsbuildinfo
+__pycache__/
+docs/superpowers/

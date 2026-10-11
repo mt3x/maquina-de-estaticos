@@ -1,0 +1,20 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  testes:
+    strategy:
+      fail-fast: false
+      matrix: { os: [macos-latest, windows-latest] }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: npm ci
+      # Igual à instalação de quem usa: cria .venv + pip + build + .env.local (o build com .venv já quebrou uma vez).
+      - run: npm run instalar
+      - run: npm test
+      - run: npm run verificar -- --ci
+      - run: npm run checar-publico

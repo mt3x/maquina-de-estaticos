@@ -1,0 +1,37 @@
+/* Base das ilustrações do README: janelas desenhadas em HTML + destaques em laranja. Nada de dado real. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { width: 900px; background: #fff; font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #1f2328; }
+.quadro { padding: 28px 30px 24px; background: linear-gradient(160deg, #f6f1ea, #ece5da); position: relative; }
+.mono { font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+
+/* Janela genérica (navegador ou terminal) */
+.janela { border-radius: 12px; overflow: hidden; box-shadow: 0 18px 50px rgba(40, 30, 20, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.08); background: #fff; position: relative; }
+.barra { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #e9e7e4; border-bottom: 1px solid #d6d3cf; }
+.bolinhas { display: flex; gap: 7px; } .bolinhas i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; } .bolinhas i:nth-child(2) { background: #febc2e; } .bolinhas i:nth-child(3) { background: #28c840; }
+.aba { margin-left: 14px; background: #fff; border-radius: 8px 8px 0 0; align-self: flex-end; padding: 8px 16px; font-size: 13px; color: #333; min-width: 170px; }
+.endereco { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: #fff; border-bottom: 1px solid #e3e0dc; }
+.endereco .campo { flex: 1; background: #f1efec; border-radius: 18px; padding: 7px 16px; font-size: 14px; color: #333; }
+.endereco .campo b { font-weight: 400; color: #777; }
+.titulo-term { flex: 1; text-align: center; font-size: 13px; color: #555; margin-right: 50px; }
+
+/* Terminal do Claude Code */
+.term { background: #1e1e1e; color: #e8e8e8; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 15px; line-height: 1.55; padding: 18px 20px 22px; }
+.term .shell { color: #9ad19a; } .term .shell b { color: #e8e8e8; font-weight: 400; }
+.term .boas { border: 1px solid #d97757; border-radius: 8px; padding: 10px 14px; margin: 12px 0 16px; width: 520px; }
+.term .boas .t { color: #d97757; } .term .cinza { color: #8b8b8b; }
+.term .entrada { border: 1px solid #6b6b6b; border-radius: 8px; padding: 10px 14px; color: #fff; }
+.term .entrada::before { content: "> "; color: #8b8b8b; }
+.term .eu { color: #bdbdbd; margin: 6px 0 12px; } .term .eu::before { content: "> "; color: #8b8b8b; }
+.term .claude { margin: 6px 0 12px; } .term .claude::before { content: "⏺ "; color: #e8e8e8; }
+.term code { color: #f0c27b; font-family: inherit; }
+.term .pedido { border: 1px solid #d97757; border-radius: 8px; padding: 12px 16px; margin-top: 8px; }
+.term .pedido .t { color: #d97757; font-weight: 700; } .term .pedido .op { padding: 1px 0; }
+.term .pedido .sel { color: #8fb8ff; }
+
+/* Destaques */
+.alvo { position: relative; outline: 4px solid #ff6a13; outline-offset: 5px; border-radius: 10px; }
+.num { position: absolute; width: 34px; height: 34px; border-radius: 50%; background: #ff6a13; color: #fff; font: 700 19px/34px -apple-system, "Segoe UI", Arial, sans-serif; text-align: center; box-shadow: 0 3px 10px rgba(255, 106, 19, 0.45); z-index: 5; }
+.seta { position: absolute; z-index: 4; pointer-events: none; }
+.legenda { margin-top: 20px; display: flex; gap: 14px; align-items: center; font-size: 21px; font-weight: 600; color: #2b2118; }
+.legenda .num { position: static; flex: none; }
+.faixa { background: #ff6a13; color: #fff; font-weight: 700; font-size: 21px; padding: 13px 20px; display: flex; align-items: center; gap: 12px; justify-content: center; }

@@ -1,0 +1,177 @@
+{
+  "id": "grao-norte",
+  "nome": "Grão Norte",
+  "versao": 1,
+  "atualizado_em": "2026-10-11",
+  "fonte_da_analise": "exemplo inventado para servir de molde",
+  "guia": "guia-marca.md",
+  "cores": {
+    "oficial": {
+      "verde_pinho": "#2F5D50",
+      "creme": "#F4EDE1",
+      "grafite": "#1B1B1B",
+      "ambar": "#E3A33B"
+    },
+    "apoio": {
+      "fundo_verde_degrade": [
+        "#2F5D50",
+        "#21443A"
+      ],
+      "fundo_papel": "#EAE1D2",
+      "cafe_torrado": "#5A3A26",
+      "logo_escuro": "#1B1B1B",
+      "logo_grao": "#E3A33B",
+      "disclaimer_sobre_claro": "#7D766C",
+      "disclaimer_sobre_escuro": "rgba(244,237,225,0.65)"
+    },
+    "regra": "Verde-pinho #2F5D50 é a cor de UI; âmbar #E3A33B só como acento (preço, selo, sublinhado); marrom do café só na foto do produto. Fundo verde: texto #F4EDE1 e CTA âmbar com texto grafite. Fundo creme: headline verde-pinho ou grafite, CTA verde-pinho com texto creme."
+  },
+  "tipografia": {
+    "principal": {
+      "familia": "Inter",
+      "confirmada": true,
+      "arquivos": null,
+      "fallback_livre": [
+        "Inter"
+      ]
+    },
+    "titulos": {
+      "familia": "Fraunces",
+      "confirmada": true,
+      "fallback_livre": [
+        "Fraunces",
+        "Young Serif"
+      ]
+    },
+    "numeral_preco": {
+      "familia": "Fraunces SemiBold, numerais de estilo antigo desligados",
+      "confirmada": false,
+      "fallback_livre": [
+        "Fraunces"
+      ]
+    },
+    "manuscrita": {
+      "familia": "caneta de giz de quadro de cafeteria",
+      "confirmada": false,
+      "fallback_livre": [
+        "Caveat",
+        "Kalam"
+      ]
+    },
+    "niveis": {
+      "headline": "Fraunces SemiBold, Sentence case, entrelinha 1.0-1.1",
+      "supratitulo": "Inter Medium CAIXA ALTA, espaçado (tracking ~200)",
+      "corpo": "Inter Regular sentence case; destaques em Inter SemiBold ou verde-pinho",
+      "cta": "Inter SemiBold CAIXA ALTA",
+      "disclaimer": "Inter Regular 12-15px em 1080 de largura"
+    }
+  },
+  "logo": {
+    "arquivos": {
+      "claro": "logo/logo-cor.png",
+      "escuro": "logo/logo-creme.png",
+      "preto": "logo/logo-grafite.png",
+      "simbolo": "logo/simbolo-grao.png"
+    },
+    "regra": "sempre usar o arquivo; nunca gerar/redesenhar; logo-cor (grafite com grão âmbar) sobre creme ou papel; logo-creme sobre verde-pinho, grafite ou foto escura; logo-grafite quando o âmbar não contrastar",
+    "largura_relativa": "12-16% da largura",
+    "posicao": {
+      "9:16": "topo centralizado (y~8%) ou rodapé centralizado acima do aviso",
+      "1:1": "canto superior esquerdo (padrão) ou inferior direito em foto"
+    }
+  },
+  "componentes": {
+    "cta": {
+      "forma": "retângulo com cantos arredondados de 12px",
+      "variantes": [
+        "verde-pinho+creme (sobre claro)",
+        "âmbar+grafite (sobre verde)",
+        "creme+grafite (sobre foto)"
+      ]
+    },
+    "preco": {
+      "estrutura": "linha pequena opcional | 'a partir de' Inter CAIXA ALTA espaçado | moeda pequena alinhada ao topo | numeral grande Fraunces | centavos e complemento pequenos ao lado"
+    },
+    "lista_check": "círculo verde-pinho com ✓ creme + texto Inter Regular",
+    "icones": "line-art verde-pinho de traço médio com legenda curta em CAIXA ALTA",
+    "etiqueta_desconto": "selo redondo âmbar com borda serrilhada, rotação ~-10°",
+    "abas_cartao": "duas abas tipo pasta no topo do cartão, verde-pinho com texto creme",
+    "caixa_translucida": "retângulo arredondado grafite ~45% sobre foto",
+    "carimbo": "carimbo circular de café com texto curvo, uma cor só"
+  },
+  "aviso_legal": {
+    "obrigatorio": true,
+    "texto": "Imagens meramente ilustrativas. Ofertas válidas enquanto durarem os estoques, nas unidades participantes. Consulte condições em graonorte.exemplo.",
+    "aplicacao": {
+      "vertical": "alternativa: margem direita, rotacionado lendo de baixo para cima, 1-2 linhas; story corpo 12-13px; feed corpo 10-11px",
+      "horizontal": "padrão: parágrafo centralizado ou justificado no rodapé, margens ~40px, abaixo do CTA; story 12-15px, feed 9-11px",
+      "cor": "baixa ênfase: creme ~65% sobre escuro, cinza quente ~#7D766C sobre claro",
+      "nunca": [
+        "sobre produto, rosto ou preço",
+        "cortado",
+        "na zona da UI do story"
+      ]
+    },
+    "correcoes_autorizadas": []
+  },
+  "zonas_seguras": {
+    "9:16": {
+      "w": 1080,
+      "h": 1920,
+      "conteudo_y": [
+        250,
+        1650
+      ],
+      "margem_x": 80
+    },
+    "1:1": {
+      "w": 1080,
+      "h": 1080,
+      "margem": 50,
+      "observacao": "usa o quadro inteiro, sem faixas vazias"
+    }
+  },
+  "estilos": [
+    "E1 foto de balcão+caixa escura",
+    "E2 verde-pinho chapado+embalagem",
+    "E3 papel creme+cartão de oferta",
+    "E4 caixinha de pergunta nativa",
+    "E5 quadro de giz manuscrito",
+    "E6 editorial serifado com xícara",
+    "E7 fundo claro com círculo e preço"
+  ],
+  "fotografia": {
+    "produto": "pacote stand-up kraft fosco com faixa verde-pinho e janela mostrando os grãos; coadjuvantes: xícara de cerâmica creme, coador de pano, grãos torrados espalhados, croissant",
+    "luz": [
+      "luz natural lateral de manhã, sombra suave",
+      "contraluz quente de fim de tarde no balcão",
+      "estúdio claro com fundo de papel"
+    ],
+    "pessoas": "brasileiros 22-50 anos, roupas do dia a dia, momento de pausa e conversa",
+    "proibido": [
+      "copos descartáveis de outras marcas",
+      "logos de terceiros",
+      "café derramado ou mesa suja"
+    ]
+  },
+  "copy": {
+    "regra": "o sistema não guarda nem inventa copy; todo texto vem do pedido, palavra por palavra; única exceção: aviso_legal"
+  },
+  "adaptacao_9x16_para_1x1": [
+    "pilha vertical vira texto à esquerda + visual à direita",
+    "ou pilha comprimida com visual ~60% e preço+lista lado a lado",
+    "foto de topo vira ~40% da altura",
+    "logo vai para um canto",
+    "headline encolhe 15-25%",
+    "foto de pessoas recortada mais fechada",
+    "aviso legal mantém a opção, corpo menor",
+    "mesmos elementos de texto nos dois formatos"
+  ],
+  "selo_imagem_ilustrativa": {
+    "texto": "*Imagens ilustrativas geradas por inteligência artificial.",
+    "quando": "toda arte com imagem de pessoas",
+    "onde": "sobre a foto (ex.: canto inferior direito da foto, ou logo acima do CTA) — nunca na barra de baixo junto ao aviso legal",
+    "estilo": "mesma fonte e corpo do aviso legal; creme com sombra suave sobre foto, para ficar legível",
+    "aplicacao": "por código, no pós-processamento"
+  }
+}

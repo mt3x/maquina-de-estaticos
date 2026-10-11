@@ -1,0 +1,25 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><link rel="stylesheet" href="estilo.css">
+<style>
+.app { background: #0e0e10; color: #e8e8ea; height: 340px; padding: 18px 26px; }
+.topo { display: flex; align-items: center; gap: 14px; } .logo { font-size: 22px; font-weight: 600; } .avatar { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: #5b6cff; display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+.titulo { font-size: 26px; margin: 34px 0 20px; font-weight: 500; }
+.grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card { height: 150px; border-radius: 14px; background: #1b1b20; border: 1px solid #2a2a31; }
+.novo { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #26262e; border: 1px solid #3a3a44; font-size: 18px; font-weight: 600; }
+.novo .mais { width: 46px; height: 46px; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; font-size: 30px; font-weight: 400; }
+.fake { padding: 14px; display: flex; flex-direction: column; justify-content: flex-end; color: #6d6d78; font-size: 13px; background: linear-gradient(160deg, #23232b, #18181d); }
+</style></head><body><div class="quadro">
+<div class="janela">
+  <div class="barra"><div class="bolinhas"><i></i><i></i><i></i></div><div class="aba">Flow</div></div>
+  <div class="endereco"><span style="color:#999">←&nbsp; →</span><div class="campo"><b>https://</b>labs.google/fx/tools/flow</div></div>
+  <div class="app">
+    <div class="topo"><span class="logo">Flow</span><span class="avatar">V</span></div>
+    <div class="titulo">Your projects</div>
+    <div class="grade">
+      <div class="card novo alvo" data-n="1" data-lado="d" style="outline-offset:6px"><span class="mais">+</span>New project</div>
+      <div class="card fake">Untitled project</div><div class="card fake">Untitled project</div>
+    </div>
+  </div>
+</div>
+<div class="legenda"><span class="num">1</span>No Flow, clique em “New project”</div>
+</div><script src="destaques.js"></script></body></html>

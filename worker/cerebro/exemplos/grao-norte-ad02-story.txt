@@ -1,0 +1,28 @@
+TASK: Recreate the advertisement in IMAGE 1 (reference) for the Grão Norte brand, keeping EXACTLY the same wireframe and visual idea. IMAGE 2 is the Grão Norte logo. IMAGE 3 is the real Grão Norte coffee bag (product photo).
+
+ELEMENT MAPPING (reference -> new):
+- Outer background (bright blue) -> pine green #2F5D50 with a subtle darker gradient to #21443A at the bottom.
+- Two folder tabs at the top of the card -> keep both tabs, same shape and position, with the same text "POR TEMPO LIMITADO", pine green #2F5D50 tabs with cream #F4EDE1 text.
+- Central rounded card (white) -> cream #F4EDE1 card with a very subtle paper texture, same size and corner radius.
+- Small letter-spaced line above the headline -> "TORRA DA SEMANA" in Inter Medium, uppercase, tracking ~200, pine green #2F5D50.
+- Big 2-line headline -> "Café fresco" / "na sua casa." (same size and weight as the reference headline), Fraunces SemiBold, graphite #1B1B1B.
+- Pill under headline ("frete grátis") -> REMOVED entirely: no pill, no shape and no text between the headline and the product (keep the same overall spacing of the layout).
+- Product (generic white pouch) -> the exact coffee bag from IMAGE 3 (matte kraft stand-up pouch with the pine green band and the window showing the beans), same angle, same size and same soft shadow as the reference product. Keep the bag's printed logo exactly as in the photo; do not redraw it.
+- Round discount sticker on the product -> amber #E3A33B scalloped round seal, rotated about -10°, with "20% OFF" in graphite #1B1B1B.
+- "a partir de:" line -> "A partir de" (the strikethrough old price is removed).
+- Huge price -> "R$39,90" with small "/250 g", same size and arrangement as the reference price, graphite #1B1B1B.
+- Logo at the bottom of the card -> Grão Norte logo from IMAGE 2, same position and size.
+
+BRAND IDENTITY (Grão Norte) — apply to every brand element:
+- Official colors: pine green #2F5D50 (main UI color), cream #F4EDE1, graphite #1B1B1B, amber #E3A33B (sparing accent only: price details, seals). The coffee brown belongs only to the product photo.
+- Typography: Fraunces (soft-contrast serif) SemiBold for headlines and the price; Inter (sans-serif) for everything else: medium/semibold uppercase for labels and buttons, regular for body. Do NOT copy the reference's fonts.
+- Logo: use ONLY the "Grão Norte" wordmark exactly as in IMAGE 2 (graphite letters with an amber coffee bean on light backgrounds; all cream on dark or green backgrounds). Never invent, redraw, stylize or add any other logo, and never typeset "GRÃO NORTE" as a logo.
+
+LEGAL TEXT (mandatory): place this exact paragraph small, discreet and fully legible (semi-transparent cream on the green background, warm grey #7D766C if it falls on the card), centered, in the same position as the reference's legal text (or at the very bottom if the reference has none), never covering the product or the price. Every word exactly as written:
+"Imagens meramente ilustrativas. Ofertas válidas enquanto durarem os estoques, nas unidades participantes. Consulte condições em graonorte.exemplo."
+
+LANGUAGE: every text in the image is in Brazilian Portuguese exactly as given. NEVER translate anything to English.
+
+RULES: Keep the reference's wireframe: same composition, element positions, proportions, text hierarchy and font sizes — each new text goes in the slot of the text it replaces, with the same size, weight, case and alignment. Spell every Portuguese text exactly as given, with all accents. Do not add any text, badges, prices, numbers or words beyond those listed, and do not drop any listed text. No third-party logos, no disposable cups, no spilled coffee. Photorealistic, premium ad quality.
+
+FORMAT: vertical 9:16 Instagram Story. Keep all important content between 13% and 86% of the height.

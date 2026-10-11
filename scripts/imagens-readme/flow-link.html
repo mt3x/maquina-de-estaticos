@@ -1,0 +1,22 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><link rel="stylesheet" href="estilo.css">
+<style>
+.app { background: #0e0e10; color: #e8e8ea; height: 360px; padding: 18px 26px; display: flex; flex-direction: column; }
+.topo { display: flex; align-items: center; gap: 14px; } .logo { font-size: 22px; font-weight: 600; } .nome { color: #9a9aa5; font-size: 15px; } .avatar { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: #5b6cff; display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+.vazio { flex: 1; display: grid; place-items: center; color: #6d6d78; font-size: 16px; }
+.prompt { border: 1px solid #34343c; background: #1b1b20; border-radius: 18px; padding: 16px 18px; color: #6d6d78; font-size: 15px; }
+.endereco .campo.alvo { background: #fff4ec; color: #1f2328; font-size: 15px; }
+.balao { position: absolute; top: 96px; left: 250px; background: #ff6a13; color: #fff; font-weight: 700; font-size: 17px; padding: 10px 16px; border-radius: 10px; box-shadow: 0 6px 18px rgba(255,106,19,0.4); z-index: 6; }
+.balao::before { content: ""; position: absolute; top: -10px; left: 40px; border: 10px solid transparent; border-top: 0; border-bottom-color: #ff6a13; }
+</style></head><body><div class="quadro">
+<div class="janela">
+  <div class="barra"><div class="bolinhas"><i></i><i></i><i></i></div><div class="aba">Flow</div></div>
+  <div class="endereco" style="padding-left:58px"><div class="campo alvo" data-n="1"><b>https://</b>labs.google/fx/tools/flow/project/0f1e2d3c-4b5a-6978-8a9b-0c1d2e3f4a5b</div></div>
+  <div class="app">
+    <div class="topo"><span class="logo">Flow</span><span class="nome">/ Untitled project</span><span class="avatar">V</span></div>
+    <div class="vazio">Projeto novo, vazio — é aqui que a máquina vai gerar as artes.</div>
+    <div class="prompt">Describe what you want to create…</div>
+  </div>
+  <div class="balao">Copie o endereço inteiro (clique na barra e Ctrl+C / ⌘+C)</div>
+</div>
+<div class="legenda"><span class="num">1</span>Copie o link da barra e cole na conversa com o Claude</div>
+</div><script src="destaques.js"></script></body></html>

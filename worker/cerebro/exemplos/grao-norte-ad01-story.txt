@@ -1,0 +1,19 @@
+TASK: Create a NATIVE-LOOKING Instagram Story that answers a "question box" (caixinha de perguntas), modeled on IMAGE 1 (reference story: real phone photo with native Instagram text overlays). IMAGE 2 is the real photo to use as the full-bleed background: keep it as a real, authentic, unedited phone photo (same hands, ceramic cup, wooden counter, window light) — do not restyle it, do not make it look like a studio shot.
+
+NATIVE INSTAGRAM ELEMENTS (must look exactly like real Instagram UI, not like an ad):
+- An Instagram question-box sticker (white rounded card, the question in the colored header area like real IG question stickers) with the question: "Qual é o seu café de todo dia?"
+- Below it, the creator's answer as native Instagram story text (same native font style and placement as the text in IMAGE 1, white text with subtle shadow), these lines in this order:
+"Sem dúvida o coado da Grão Norte."
+"Peço o pacote de 250 g moído na hora e dura a semana inteira."
+"Tem gosto de caramelo e não amarga nem frio."
+"Quem gosta de café precisa provar 👇"
+- No logo, no brand graphics, no buttons, no price: it must feel 100% organic/native.
+
+LEGAL TEXT (mandatory): place this exact paragraph small, discreet and fully legible (low-emphasis warm grey #7D766C on light areas, semi-transparent cream on dark areas), centered, in the same position as the reference's legal text (or at the very bottom if the reference has none), never covering faces, hands, cup or the question box. Every word exactly as written:
+"Imagens meramente ilustrativas. Ofertas válidas enquanto durarem os estoques, nas unidades participantes. Consulte condições em graonorte.exemplo."
+
+LANGUAGE: every text in the image is in Brazilian Portuguese exactly as given. NEVER translate anything to English.
+
+RULES: Keep the reference's wireframe: same composition, element positions, proportions, text hierarchy and font sizes — each new text goes in the slot of the text it replaces, with the same size, weight, case and alignment. Portuguese text must be spelled exactly as given, with all accents. Do not add any text, badges, prices, numbers or words beyond those listed. No third-party logos, no disposable cups, no spilled coffee. Photorealistic, premium ad quality.
+
+FORMAT: vertical 9:16 Instagram Story. Keep all important content between 13% and 86% of the height.

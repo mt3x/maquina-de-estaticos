@@ -1,0 +1,18 @@
+export type Checagem = { id: "node" | "python" | "chrome" | "claude" | "disco"; ok: boolean; detalhe: string; comoResolver?: string };
+export type Rodar = (bin: string, args: string[]) => string | null;
+export declare const NODE_MIN: [number, number];
+export declare const PYTHON_MIN: [number, number];
+export declare const DISCO_MIN_GB: number;
+export declare function avaliarVersao(texto: string, minimo: [number, number]): boolean;
+export declare function checarNode(versao?: string, plataforma?: NodeJS.Platform): Checagem;
+export declare function descobrirPython(rodar: Rodar, plataforma?: NodeJS.Platform): { cmd: string; args: string[]; versao: string; ok: boolean } | null;
+export declare function checarPython(rodar: Rodar, plataforma?: NodeJS.Platform): Checagem;
+export declare function checarChrome(resolver?: () => string | null, plataforma?: NodeJS.Platform): Checagem;
+export declare function checarDisco(livreGb: number): Checagem;
+export declare function checarClaude(rodar: Rodar): Checagem;
+export declare function comandoSpawn(bin: string, args: string[], plataforma?: NodeJS.Platform): { cmd: string; args: string[]; shell: boolean };
+export declare function pythonBin(o?: { plataforma?: NodeJS.Platform; raiz?: string; env?: Record<string, string | undefined>; existe?: (p: string) => boolean }): string;
+export declare function rodarComando(bin: string, args: string[], timeout?: number): string | null;
+export declare function discoLivreGb(dir?: string, statfs?: (dir: string) => { bavail: number | bigint; bsize: number | bigint }): number;
+export declare function venvPronto(o?: { plataforma?: NodeJS.Platform; raiz?: string; existe?: (p: string) => boolean }): boolean;
+export declare function rodarVerificacoes(o?: { ci?: boolean; incluirClaude?: boolean }): Promise<Checagem[]>;
