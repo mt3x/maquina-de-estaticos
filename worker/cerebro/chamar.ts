@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process"; import fs from "node:fs"; import path from "node:path";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process"; import fs from "node:fs"; import os from "node:os"; import path from "node:path";
 import type { z } from "zod"; import { comandoSpawn } from "@/lib/plataforma";
 
 export class ErroCerebro extends Error {}
@@ -17,11 +17,19 @@ export function comandoCerebro(bin: string, args: string[], plataforma: NodeJS.P
   return comandoSpawn(bin, args, plataforma);
 }
 
+/** No Windows o claude roda dentro do cmd.exe: matar só o cmd deixaria o claude vivo. */
+function matarArvore(p: ChildProcess) {
+  if (process.platform === "win32" && p.pid) spawnSync("taskkill", ["/pid", String(p.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
+  else p.kill("SIGKILL");
+}
+
 function executar(args: string[], stdin: string, timeoutMs: number): Promise<string> {
   return new Promise((resolve, reject) => {
-    const c = comandoCerebro(process.env.CEREBRO_BIN || "claude", args); const p = spawn(c.cmd, c.args, { stdio: ["pipe", "pipe", "pipe"], shell: c.shell });
+    const c = comandoCerebro(process.env.CEREBRO_BIN || "claude", args); // cwd neutro: rodando na pasta do projeto o claude carregaria o CLAUDE.md de instalação (os caminhos do pedido são absolutos).
+    const p = spawn(c.cmd, c.args, { stdio: ["pipe", "pipe", "pipe"], shell: c.shell, cwd: os.tmpdir(), windowsHide: true });
     let out = "", err = "", settled = false;
-    const t = setTimeout(() => { if (settled) return; settled = true; p.kill("SIGKILL"); reject(new ErroCerebro(`claude excedeu ${timeoutMs / 1000}s`)); }, timeoutMs);
+    const t = setTimeout(() => { if (settled) return; settled = true; matarArvore(p); reject(new ErroCerebro(`claude excedeu ${timeoutMs / 1000}s`)); }, timeoutMs);
+    p.stdout.setEncoding("utf8"); p.stderr.setEncoding("utf8"); // acentos partidos entre pedaços não viram �
     p.stdout.on("data", (d) => (out += d)); p.stderr.on("data", (d) => (err += d));
     p.on("error", (e) => { if (settled) return; settled = true; clearTimeout(t); reject(new ErroCerebro(`claude não executou: ${e.message}`)); });
     p.on("close", (code) => {
@@ -34,6 +42,7 @@ function executar(args: string[], stdin: string, timeoutMs: number): Promise<str
       try { const j = JSON.parse(out); if (j.is_error) return reject(new ErroCerebro(String(j.result ?? j.subtype ?? "erro desconhecido").slice(0, 300))); resolve(String(j.result ?? "")); }
       catch { reject(new ErroCerebro(`saída do claude não é JSON: ${out.slice(0, 200)}`)); }
     });
+    p.stdin.on("error", () => { /* claude saiu antes de ler tudo: o close acima rejeita */ });
     p.stdin.end(stdin);
   });
 }

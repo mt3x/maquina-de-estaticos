@@ -15,13 +15,13 @@ const aspas = (a: string) => (/[\s"&|<>^%()]/.test(a) ? `"${a.replace(/"/g, '\\"
 /** No Windows, `npm`/`claude` são .cmd e só rodam via shell; argumentos com espaço, aspas ou & | < > ^ % ( ) vão entre aspas. */
 export function comandoSpawn(bin: string, args: string[], plataforma: NodeJS.Platform = process.platform) {
   if (plataforma !== "win32" || /\.exe$/i.test(bin)) return { cmd: bin, args, shell: false };
-  return { cmd: bin, args: args.map(aspas), shell: true };
+  return { cmd: [bin, ...args.map(aspas)].join(" "), args: [] as string[], shell: true }; // linha única: o Node 24 avisa (DEP0190) se args vierem com shell
 }
 
 const script = (rel: string) => path.join(/*turbopackIgnore: true*/ process.cwd(), rel);
 export function rodarPython(rel: string, args: string[], o: { env?: NodeJS.ProcessEnv; timeout?: number } = {}) {
-  return execFileP(pythonBin(), [script(rel), ...args], { env: o.env ?? process.env, timeout: o.timeout ?? 60_000 });
+  return execFileP(pythonBin(), [script(rel), ...args], { env: { ...(o.env ?? process.env), PYTHONUTF8: "1", PYTHONIOENCODING: "utf-8" }, timeout: o.timeout ?? 60_000 });
 }
 export function rodarPythonSync(rel: string, args: string[], o: { timeout?: number } = {}) {
-  execFileSync(pythonBin(), [script(rel), ...args], { timeout: o.timeout ?? 30_000 });
+  execFileSync(pythonBin(), [script(rel), ...args], { env: { ...process.env, PYTHONUTF8: "1", PYTHONIOENCODING: "utf-8" }, timeout: o.timeout ?? 30_000 });
 }

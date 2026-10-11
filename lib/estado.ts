@@ -6,12 +6,23 @@ export function lerJson<T>(arq: string, padrao?: T): T {
   try { return JSON.parse(fs.readFileSync(arq, "utf8")) as T; }
   catch (e) { if (padrao !== undefined) return padrao; throw e; }
 }
+/** renameSync que tenta de novo por até ~2 s em EPERM/EACCES/EBUSY (no Windows o antivírus segura arquivos novos por instantes). */
+export function renomear(de: string, para: string) {
+  for (let i = 0; ; i++) {
+    try { fs.renameSync(de, para); return; }
+    catch (e) {
+      const c = (e as NodeJS.ErrnoException).code;
+      if (i >= 20 || !(c === "EPERM" || c === "EACCES" || c === "EBUSY")) throw e;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+    }
+  }
+}
 /** Grava em .tmp e renomeia: leitores nunca veem arquivo pela metade. */
 export function salvarJson(arq: string, obj: unknown) {
   fs.mkdirSync(path.dirname(arq), { recursive: true });
   const tmp = `${arq}.${process.pid}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(obj, null, 2));
-  fs.renameSync(tmp, arq);
+  renomear(tmp, arq);
 }
 export const lerRemessa = (id: string) => lerJson<Remessa>(arqEstado(id));
 export function salvarRemessa(r: Remessa) { r.atualizadaEm = new Date().toISOString(); salvarJson(arqEstado(r.id), r); }

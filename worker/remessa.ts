@@ -1,5 +1,5 @@
 import fs from "node:fs"; import path from "node:path"; import crypto from "node:crypto";
-import { lerRemessa, salvarRemessa, registrar, listarRemessas, lerJson, salvarJson } from "@/lib/estado";
+import { lerRemessa, salvarRemessa, registrar, listarRemessas, lerJson, salvarJson, renomear } from "@/lib/estado";
 import { dirEntrada, dirInterno, arqEntrega, arqUploads, raizDados, arqPrompt, paraPosix } from "@/lib/caminhos";
 import { criarArtes, FORMATOS, type Arte, type Comando, type Formato, type ModeloId, type Remessa } from "@/lib/tipos";
 import { textoDocx } from "@/lib/docx";
@@ -115,6 +115,11 @@ export function confirmarRemessa(cmd: Extract<Comando, { tipo: "confirmar" }>) {
   r.duvidas = []; r.etapa = "escrevendo_prompts"; registrar(r, "confirmada", `modelos: ${cmd.modelos.join(", ")}`); salvarRemessa(r);
 }
 
+/** Ingredientes que não existem no disco (ou fora da pasta permitida): subi-los quebraria a remessa em loop. */
+export function ingredientesFaltando(tokens: string[], r: Pick<Remessa, "id" | "marca">): string[] {
+  return tokens.filter((t) => { try { return !fs.statSync(resolverIngrediente(t, r.id, r.marca).abs).isFile(); } catch { return true; } });
+}
+
 export async function escreverPrompts(id: string, deps: Deps) {
   const r = lerRemessa(id);
   try {
@@ -122,7 +127,10 @@ export async function escreverPrompts(id: string, deps: Deps) {
       const modelos = a.artes.filter((x) => x.formato === f).map((x) => x.modelo);
       if (modelos.every((m) => fs.existsSync(arqPrompt(id, a.id, f, m, 1)))) continue;
       const t0 = Date.now();
-      const p = await deps.cerebro.escreverPrompt({ anuncio: a, formato: f, marca: r.marca, entradaDir: dirEntrada(id), logDir: path.join(dirInterno(id), "cerebro") });
+      const pedir = (aviso?: string) => deps.cerebro.escreverPrompt({ anuncio: a, formato: f, marca: r.marca, entradaDir: dirEntrada(id), logDir: path.join(dirInterno(id), "cerebro"), aviso });
+      let p = await pedir(); let faltam = ingredientesFaltando(p.ingredientes, r);
+      if (faltam.length) { p = await pedir(`estes ingredientes não existem: ${faltam.join(", ")}. Use só arquivos que existem.`); faltam = ingredientesFaltando(p.ingredientes, r); }
+      if (faltam.length) throw new Error(`o prompt de ${a.id} ${f} pede arquivos que não existem: ${faltam.join(", ")}`);
       for (const m of modelos) gravarPrompt(arqPrompt(id, a.id, f, m, 1), p);
       registrar(r, "escrevendo_prompts", `${a.id} ${f}`, Date.now() - t0); salvarRemessa(r);
     }
@@ -131,14 +139,16 @@ export async function escreverPrompts(id: string, deps: Deps) {
   salvarRemessa(r);
 }
 
+export const chaveUpload = (nomeFlow: string, projeto = process.env.FLOW_PROJETO ?? "") => `${projeto}/${nomeFlow}`;
 /** Sobe ao Flow os ingredientes ainda não enviados. Devolve false (sem tocar no Flow) se houver bloqueio global. */
 async function subirFaltantes(r: Remessa, tokens: Iterable<string>, deps: Deps): Promise<boolean> {
   const enviados = lerJson<Record<string, string>>(arqUploads(), {});
   for (const t of tokens) {
     const { abs, nomeFlow } = resolverIngrediente(t, r.id, r.marca);
-    if (enviados[nomeFlow]) continue;
+    const chave = chaveUpload(nomeFlow); // por projeto: trocar de projeto no Flow sobe tudo de novo
+    if (enviados[chave]) continue;
     if (lerBloqueio()) return false;
-    await deps.flow.subir(abs, nomeFlow); enviados[nomeFlow] = new Date().toISOString(); salvarJson(arqUploads(), enviados);
+    await deps.flow.subir(abs, nomeFlow); enviados[chave] = new Date().toISOString(); salvarJson(arqUploads(), enviados);
     registrar(r, "enviando_referencias", `enviado ${nomeFlow}`);
   }
   return true;
@@ -228,24 +238,37 @@ async function gerarArte(alvo: Alvo, deps: Deps): Promise<{ alvo: Alvo; resultad
   arte.status = "pos"; salvarRemessa(r);
   const destino = arqEntrega(r.id, an.id, arte.modelo, arte.formato);
   const novo = path.join(dirInterno(r.id), "pos", `${an.id}-${arte.modelo}-${arte.formato}.png`);
-  await deps.pos.finalizar(bruto, novo, arte.formato);
-  const avisoPorCodigo = deps.pos.aplicarAviso ? await deps.pos.aplicarAviso(novo, r.marca) : false;
-  await deps.pos.aplicarSelo(novo, r.marca); // pula se a marca não tem selo configurado
-  r = lerRemessa(alvo.remessa); arte = arteDe(r, alvo);
-  if (fs.existsSync(destino)) {
-    const dir = path.join(dirInterno(r.id), "versoes", `${an.id}-${arte.modelo}-${arte.formato}`);
-    fs.mkdirSync(dir, { recursive: true }); fs.renameSync(destino, nomeArquivado(arte, dir));
+  let avisoPorCodigo = false; let mini = ""; let arquivada: string | null = null;
+  // Erro aqui é do computador (Python, disco), não do Flow: gerar de novo só gastaria tentativas. A arte falha
+  // (a imagem do Flow fica em .interno/brutos) e a remessa para com erro para a pessoa ver o motivo.
+  try {
+    await deps.pos.finalizar(bruto, novo, arte.formato);
+    avisoPorCodigo = deps.pos.aplicarAviso ? await deps.pos.aplicarAviso(novo, r.marca) : false;
+    await deps.pos.aplicarSelo(novo, r.marca); // pula se a marca não tem selo configurado
+    r = lerRemessa(alvo.remessa); arte = arteDe(r, alvo);
+    if (fs.existsSync(destino)) {
+      const dir = path.join(dirInterno(r.id), "versoes", `${an.id}-${arte.modelo}-${arte.formato}`);
+      fs.mkdirSync(dir, { recursive: true }); arquivada = nomeArquivado(arte, dir); renomear(destino, arquivada);
+    }
+    fs.mkdirSync(path.dirname(destino), { recursive: true }); renomear(novo, destino);
+    Object.assign(arte, { arquivo: destino, versaoEntregue: arte.versaoAtual, tentativaEntregue: arte.tentativas }); salvarRemessa(r);
+  } catch (e) {
+    const msg = `acabamento da imagem falhou (a imagem gerada ficou em ${bruto}): ${e instanceof Error ? e.message : String(e)}`;
+    // a versão anterior já tinha saído de entrega/ e a nova não entrou: devolve a anterior
+    if (arquivada && !fs.existsSync(destino)) { try { renomear(arquivada, destino); } catch { /* fica em versoes/ */ } }
+    r = lerRemessa(alvo.remessa); arte = arteDe(r, alvo);
+    falhar(arte, msg); erroRemessa(r, "outro", msg); salvarRemessa(r);
+    return { alvo, resultado: res };
   }
-  fs.mkdirSync(path.dirname(destino), { recursive: true }); fs.renameSync(novo, destino);
-  Object.assign(arte, { arquivo: destino, versaoEntregue: arte.versaoAtual, tentativaEntregue: arte.tentativas }); salvarRemessa(r);
-  const mini = path.join(dirInterno(r.id), "miniaturas", `${an.id}-${arte.modelo}-${arte.formato}-v${arte.versaoAtual}-t${arte.tentativas}.webp`);
-  await deps.pos.miniatura(destino, mini);
-  r = lerRemessa(alvo.remessa); arte = arteDe(r, alvo); Object.assign(arte, { status: "revisando", miniatura: mini }); salvarRemessa(r);
+  // A imagem já está em entrega/: falha na miniatura não pode jogar fora uma arte boa.
+  mini = path.join(dirInterno(r.id), "miniaturas", `${an.id}-${arte.modelo}-${arte.formato}-v${arte.versaoAtual}-t${arte.tentativas}.webp`);
+  try { await deps.pos.miniatura(destino, mini); } catch { mini = ""; }
+  r = lerRemessa(alvo.remessa); arte = arteDe(r, alvo); Object.assign(arte, { status: "revisando", miniatura: mini || undefined }); salvarRemessa(r);
   let rev: Arte["revisao"];
   try { rev = await deps.cerebro.revisar({ arteAbs: destino, anuncio: an, formato: arte.formato, marca: r.marca, refAbs: path.join(dirEntrada(r.id), an.ref), avisoPorCodigo, logDir: path.join(dirInterno(r.id), "cerebro") }); }
   catch { rev = { ok: true, gravidade: "leve", problemas: ["revisão automática indisponível"] }; }
   r = lerRemessa(alvo.remessa); arte = arteDe(r, alvo);
-  Object.assign(arte, { revisao: rev, arquivo: destino, miniatura: mini });
+  Object.assign(arte, { revisao: rev, arquivo: destino, miniatura: mini || undefined });
   if (rev!.gravidade === "grave") {
     if (arte.tentativas < deps.maxTentativas) { arte.status = "na_fila"; arte.prioridade = -1; }
     else arte.status = "defeito";
@@ -265,7 +288,9 @@ export async function aplicarAjuste(cmd: Extract<Comando, { tipo: "ajuste" }>, d
   try {
     for (const arte of alvos) {
       const atual = lerJson<{ prompt: string; ingredientes: string[] }>(arqPrompt(r.id, an.id, arte.formato, arte.modelo, arte.versaoAtual));
-      const novo = await deps.cerebro.ajustar({ promptAtual: atual.prompt, ingredientes: atual.ingredientes, pedido: cmd.texto, arteAbs: arqEntrega(r.id, an.id, arte.modelo, arte.formato), marca: r.marca, entradaDir: dirEntrada(r.id), logDir: path.join(dirInterno(r.id), "cerebro") });
+      const novo: { prompt: string; ingredientes: string[] } = await deps.cerebro.ajustar({ promptAtual: atual.prompt, ingredientes: atual.ingredientes, pedido: cmd.texto, arteAbs: arqEntrega(r.id, an.id, arte.modelo, arte.formato), marca: r.marca, entradaDir: dirEntrada(r.id), logDir: path.join(dirInterno(r.id), "cerebro") });
+      const faltam = ingredientesFaltando(novo.ingredientes, r);
+      if (faltam.length) throw new Error(`o novo prompt pede arquivos que não existem: ${faltam.join(", ")}`);
       novos.push({ arte, prompt: novo });
     }
   } catch (e) {
@@ -309,7 +334,8 @@ export async function aplicarControle(cmd: Comando) {
       r.etapa = "concluida"; registrar(r, "cancelada", "cancelada pelo usuário"); break;
     case "preferida": { const a = r.anuncios.find((x) => x.id === cmd.anuncio); if (a) a.preferida = { ...a.preferida, [cmd.formato]: cmd.modelo }; break; }
     case "apoio": { const a = r.anuncios.find((x) => x.id === cmd.anuncio); if (a && !a.apoio.includes(cmd.arquivo)) a.apoio.push(cmd.arquivo);
-      r.duvidas = r.duvidas.filter((d) => !d.pergunta.includes(path.basename(cmd.arquivo))); registrar(r, "apoio", `recebido ${cmd.arquivo}`); break; }
+      const nomes = [path.basename(cmd.arquivo), cmd.nomeOriginal].filter((n): n is string => !!n);
+      r.duvidas = r.duvidas.filter((d) => !nomes.some((n) => d.pergunta.includes(n))); registrar(r, "apoio", `recebido ${cmd.arquivo}`); break; }
     case "tentar_de_novo": {
       const an = r.anuncios.find((x) => x.id === cmd.anuncio); const x = an?.artes.find((a) => a.formato === cmd.formato && a.modelo === cmd.modelo);
       if (!an || !x || !["falhou", "defeito"].includes(x.status)) { registrar(r, "aviso", `gerar de novo ignorado: ${cmd.anuncio} ${cmd.modelo} ${cmd.formato} não está com falha`); break; }

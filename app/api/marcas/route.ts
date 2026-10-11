@@ -30,7 +30,8 @@ export async function POST(req: Request) {
   const d = dirMarca(id);
   if (fs.existsSync(path.join(d, "identidade.json"))) return Response.json({ erro: "marca já existe" }, { status: 409 });
   const gravar = async (f: FormDataEntryValue, sub: string, nomeArq?: string) => { if (!(f instanceof File)) return;
-    const a = path.join(d, sub, nomeArq ?? normalizarSegmento(f.name)); fs.mkdirSync(path.dirname(a), { recursive: true }); fs.writeFileSync(a, Buffer.from(await f.arrayBuffer())); };
+    let a = path.join(d, sub, nomeArq ?? normalizarSegmento(f.name));
+    for (let i = 2; !nomeArq && fs.existsSync(a); i++) { const x = path.parse(path.join(d, sub, normalizarSegmento(f.name))); a = path.join(x.dir, `${x.name}-${i}${x.ext}`); } fs.mkdirSync(path.dirname(a), { recursive: true }); fs.writeFileSync(a, Buffer.from(await f.arrayBuffer())); };
   const tipo = (f: FormDataEntryValue, re: RegExp) => f instanceof File && re.test(f.name);
   for (const f of fd.getAll("base")) if (tipo(f, /\.(png|jpe?g|webp)$/i)) await gravar(f, "base");
   for (const f of fd.getAll("fontes")) if (tipo(f, /\.(otf|ttf)$/i)) await gravar(f, "fontes");

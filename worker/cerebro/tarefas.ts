@@ -22,9 +22,20 @@ export function interpretar(o: { remessa: string; marca: string; texto: string; 
     dirs: [...new Set(Object.values(o.refsAbs).map((a) => path.dirname(a)))] });
 }
 
-export function escreverPrompt(o: { anuncio: Anuncio; formato: Formato; marca: string; entradaDir: string; logDir: string }): Promise<SaidaPrompt> {
+/** Imagens da marca que podem virar ingrediente `marca:<rel>` (com `/`). */
+export function arquivosDaMarca(marca: string, rel = ""): string[] {
+  const d = path.join(dirMarca(marca), rel); if (!fs.existsSync(d)) return [];
+  return fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => {
+    const r = rel ? `${rel}/${e.name}` : e.name;
+    if (e.isDirectory()) return e.name.startsWith(".") || e.name === "base" ? [] : arquivosDaMarca(marca, r);
+    return /\.(png|jpe?g|webp)$/i.test(e.name) ? [r] : [];
+  });
+}
+
+export function escreverPrompt(o: { anuncio: Anuncio; formato: Formato; marca: string; entradaDir: string; logDir: string; aviso?: string }): Promise<SaidaPrompt> {
   const a = o.anuncio;
-  const pedido = `MARCA: ${o.marca} (arquivos da marca em ${dirMarca(o.marca)}; produtos em produtos/)\nIDENTIDADE:\n${identidade(o.marca)}\n\nANÚNCIO ${a.id} — FORMATO ${o.formato}\nREFERÊNCIA (Read): ${path.join(o.entradaDir, a.ref)}\nAPOIO (Read): ${a.apoio.map((r) => path.join(o.entradaDir, r)).join(", ") || "nenhum"}\nTEM PESSOAS: ${a.temPessoas}\n\nCOPY (literal):\n${a.copy}\n\nINSTRUÇÕES:\n${a.instrucoes || "(nenhuma)"}\n\nEXEMPLOS DE PROMPTS APROVADOS:\n${exemplos()}`;
+  const daMarca = arquivosDaMarca(o.marca);
+  const pedido = `MARCA: ${o.marca} (arquivos da marca em ${dirMarca(o.marca)})\nIMAGENS DA MARCA DISPONÍVEIS (use só estas como "marca:<arquivo>"; se a lista não tiver logo, não inclua logo nos ingredientes):\n${daMarca.join("\n") || "(nenhuma)"}\nIDENTIDADE:\n${identidade(o.marca)}\n\nANÚNCIO ${a.id} — FORMATO ${o.formato}\nREFERÊNCIA (Read): ${path.join(o.entradaDir, a.ref)}\nAPOIO (Read): ${a.apoio.map((r) => path.join(o.entradaDir, r)).join(", ") || "nenhum"}\nTEM PESSOAS: ${a.temPessoas}\n\nCOPY (literal):\n${a.copy}\n\nINSTRUÇÕES:\n${a.instrucoes || "(nenhuma)"}\n\nEXEMPLOS DE PROMPTS APROVADOS:\n${exemplos()}${o.aviso ? `\n\nATENÇÃO: ${o.aviso}` : ""}`;
   return chamarCerebro({ tarefa: "prompts", sistema: tmpSistema("prompts"), pedido, schema: schemaPrompt, logDir: o.logDir, dirs: [o.entradaDir, dirMarca(o.marca)] });
 }
 
@@ -35,7 +46,7 @@ export function revisar(o: { arteAbs: string; anuncio: Anuncio; formato: Formato
 }
 
 export function ajustar(o: { promptAtual: string; ingredientes: string[]; pedido: string; arteAbs: string; marca: string; entradaDir: string; logDir: string }): Promise<SaidaPrompt> {
-  const pedido = `PEDIDO DE AJUSTE DO USUÁRIO:\n${o.pedido}\n\nARTE ATUAL (Read): ${o.arteAbs}\nINGREDIENTES ATUAIS: ${JSON.stringify(o.ingredientes)}\n\nPROMPT ATUAL:\n${o.promptAtual}`;
+  const pedido = `PEDIDO DE AJUSTE DO USUÁRIO:\n${o.pedido}\n\nIMAGENS DA MARCA DISPONÍVEIS (use só estas como "marca:<arquivo>"):\n${arquivosDaMarca(o.marca).join("\n") || "(nenhuma)"}\n\nARTE ATUAL (Read): ${o.arteAbs}\nINGREDIENTES ATUAIS: ${JSON.stringify(o.ingredientes)}\n\nPROMPT ATUAL:\n${o.promptAtual}`;
   return chamarCerebro({ tarefa: "ajustar", sistema: tmpSistema("ajustar"), pedido, schema: schemaPrompt, logDir: o.logDir, dirs: [path.dirname(o.arteAbs), o.entradaDir, dirMarca(o.marca)] });
 }
 

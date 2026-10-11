@@ -10,12 +10,16 @@ function perfilPadrao(env = process.env, cwd = /*turbopackIgnore: true*/ process
 }
 
 function resolveChromePath(plataforma = process.platform, existe = fs.existsSync, env = process.env) {
+  if (env.FLOW_CHROME_PATH) return existe(env.FLOW_CHROME_PATH) ? env.FLOW_CHROME_PATH : null;
   if (plataforma === "win32") {
     const rel = ["Google", "Chrome", "Application", "chrome.exe"];
     const cands = [env.PROGRAMFILES, env["PROGRAMFILES(X86)"], env.LOCALAPPDATA].filter(Boolean).map(b => path.win32.join(b, ...rel));
     return cands.find(p => existe(p)) || null;
   }
-  if (plataforma === "darwin") { const p = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"; return existe(p) ? p : null; }
+  if (plataforma === "darwin") {
+    const rel = path.posix.join("Google Chrome.app", "Contents", "MacOS", "Google Chrome");
+    return ["/Applications", env.HOME && path.posix.join(env.HOME, "Applications")].filter(Boolean).map(b => path.posix.join(b, rel)).find(p => existe(p)) || null;
+  }
   return ["/usr/bin/google-chrome", "/usr/bin/google-chrome-stable"].find(p => existe(p)) || null;
 }
 

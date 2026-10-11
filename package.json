@@ -3,6 +3,7 @@
   "private": true,
   "license": "MIT",
   "type": "module",
+  "engines": { "node": ">=20.12" },
   "scripts": {
     "dev": "concurrently -k -n web,worker \"next dev -p 3200 -H 127.0.0.1\" \"tsx watch worker/index.ts\"",
     "build": "next build",

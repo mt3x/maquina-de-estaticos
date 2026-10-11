@@ -1,6 +1,7 @@
 import fs from "node:fs"; import path from "node:path";
 import { dirMarca } from "@/lib/caminhos";
 import { rodarPython } from "@/lib/plataforma";
+import { renomear } from "@/lib/estado";
 
 /** Texto do selo da identidade da marca, quebrado em duas linhas antes de " por " (se houver). */
 export function textoSelo(texto: string): string { return texto.replace(/ por /, "\n por ").replace("\n ", "\n"); }
@@ -16,5 +17,5 @@ export async function aplicarSelo(arq: string, marca: string): Promise<boolean> 
   const tmp = `${arq}.selo.png`;
   await rodarPython("motor-flow/selo_ilustrativa.py", [arq, tmp, "--auto", "--igual-aviso", "--sombra", "--texto", textoSelo(texto)],
     { env: { ...process.env, MAQUINA_FONTE_SELO: path.join(fontes, fonte) }, timeout: 60_000 });
-  fs.renameSync(tmp, arq); return true;
+  renomear(tmp, arq); return true;
 }

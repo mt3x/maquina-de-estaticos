@@ -43,7 +43,7 @@ export type Comando = { id: string; ts: string } & (
   | { tipo: "pausar" | "retomar" | "cancelar"; remessa: string }
   | { tipo: "ajuste"; remessa: string; anuncio: string; formato: Formato; modelo: ModeloId; escopo: Escopo; texto: string }
   | { tipo: "preferida"; remessa: string; anuncio: string; formato: Formato; modelo: ModeloId }
-  | { tipo: "apoio"; remessa: string; anuncio: string; arquivo: string }
+  | { tipo: "apoio"; remessa: string; anuncio: string; arquivo: string; nomeOriginal?: string }
   | { tipo: "tentar_de_novo"; remessa: string; anuncio: string; formato: Formato; modelo: ModeloId }
   | { tipo: "extrair_marca"; marca: string }
   | { tipo: "desbloquear" }

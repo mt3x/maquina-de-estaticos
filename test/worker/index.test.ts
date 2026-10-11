@@ -2,7 +2,7 @@ import fs from "node:fs"; import os from "node:os"; import path from "node:path"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 vi.mock("@/lib/docx", () => ({ textoDocx: vi.fn(async () => "R61 - AD-01\nREF: ref-01") }));
 import { ambiente, remessaImportada, depsFalsas } from "./helpers";
-import { ciclo, batimento } from "@/worker/index";
+import { ciclo, batimento, limitesFlow } from "@/worker/index";
 import { enfileirar } from "@/lib/comandos";
 import { lerRemessa, lerJson } from "@/lib/estado";
 import { arqStatus, arqWorker } from "@/lib/caminhos";
@@ -65,5 +65,14 @@ describe("ciclo do worker", () => {
     remessaImportada("R61"); const deps = await depsFalsas(); const chrome = vi.fn(async () => true);
     await ciclo(deps, { chrome }); await ciclo(deps, { chrome });
     expect(chrome).not.toHaveBeenCalled();
+  });
+});
+
+describe("limitesFlow (travas da conta)", () => {
+  it("o .env.local não consegue tirar a pausa nem aumentar tentativas", () => {
+    expect(limitesFlow({})).toEqual({ minS: 45, maxS: 60, maxTentativas: 3 });
+    expect(limitesFlow({ PAUSA_MIN_S: "45s", PAUSA_MAX_S: "abc", MAX_TENTATIVAS: "x" })).toEqual({ minS: 45, maxS: 60, maxTentativas: 3 });
+    expect(limitesFlow({ PAUSA_MIN_S: "5", PAUSA_MAX_S: "10", MAX_TENTATIVAS: "10" })).toEqual({ minS: 45, maxS: 45, maxTentativas: 3 });
+    expect(limitesFlow({ PAUSA_MIN_S: "90", PAUSA_MAX_S: "120", MAX_TENTATIVAS: "2" })).toEqual({ minS: 90, maxS: 120, maxTentativas: 2 });
   });
 });

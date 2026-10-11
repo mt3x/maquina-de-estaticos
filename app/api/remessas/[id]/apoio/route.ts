@@ -15,6 +15,6 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (!lerRemessa(id).anuncios.some((a) => a.id === anuncio)) return Response.json({ erro: "anúncio não encontrado" }, { status: 400 });
   const rel = paraPosix(path.join("apoio", normalizarSegmento(f.name))); const abs = path.join(dirEntrada(id), rel);
   fs.mkdirSync(path.dirname(abs), { recursive: true }); fs.writeFileSync(abs, Buffer.from(await f.arrayBuffer()));
-  enfileirar({ tipo: "apoio", remessa: id, anuncio, arquivo: rel });
+  enfileirar({ tipo: "apoio", remessa: id, anuncio, arquivo: rel, nomeOriginal: f.name });
   return Response.json({ ok: true, arquivo: rel });
 }

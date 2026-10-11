@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import fs from "node:fs"; import os from "node:os"; import path from "node:path";
-import { salvarJson, lerJson, salvarRemessa, lerRemessa, listarRemessas, registrar } from "@/lib/estado";
+import { salvarJson, lerJson, salvarRemessa, lerRemessa, listarRemessas, registrar, renomear } from "@/lib/estado";
+import { vi } from "vitest";
 import { dentroDe, raizDados } from "@/lib/caminhos";
 import { criarArtes, type Remessa } from "@/lib/tipos";
 
@@ -40,5 +41,17 @@ describe("estado", () => {
     const estadoR2 = path.join(dir, "remessas", "R2", "estado.json");
     fs.writeFileSync(estadoR2, "{quebrado");
     expect(listarRemessas().map((x) => x.id)).toEqual(["R1"]);
+  });
+});
+
+describe("renomear", () => {
+  it("tenta de novo quando o Windows segura o arquivo (EPERM) e desiste em outros erros", () => {
+    const de = path.join(dir, "a.txt"), para = path.join(dir, "b.txt"); fs.writeFileSync(de, "x");
+    const real = fs.renameSync; let n = 0;
+    const spy = vi.spyOn(fs, "renameSync").mockImplementation((a, b) => { if (n++ < 2) throw Object.assign(new Error("ocupado"), { code: "EPERM" }); real(a, b); });
+    renomear(de, para); expect(fs.readFileSync(para, "utf8")).toBe("x"); expect(n).toBe(3);
+    spy.mockImplementation(() => { throw Object.assign(new Error("sumiu"), { code: "ENOENT" }); });
+    expect(() => renomear(de, para)).toThrow("sumiu");
+    spy.mockRestore();
   });
 });

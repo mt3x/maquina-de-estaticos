@@ -28,16 +28,16 @@ describe("comandoSpawn", () => {
   it("no Mac chama direto, sem shell", () => {
     expect(comandoSpawn("claude", ["-p"], "darwin")).toEqual({ cmd: "claude", args: ["-p"], shell: false });
   });
-  it("no Windows usa shell e protege argumentos com espaço e aspas", () => {
-    const r = comandoSpawn("claude", ["--add-dir", "C:\\Pessoas\\Maria Silva\\x", 'diz "oi"'], "win32");
-    expect(r.shell).toBe(true);
-    expect(r.cmd).toBe("claude");
-    expect(r.args).toEqual(["--add-dir", '"C:\\Pessoas\\Maria Silva\\x"', '"diz \\"oi\\""']);
+  it("no Windows usa shell numa linha única (sem args: DEP0190) e protege argumentos com espaço e aspas", () => {
+    for (const c of comandos) {
+      const r = c("claude", ["--add-dir", "C:\\Pessoas\\Maria Silva\\x", 'diz "oi"'], "win32");
+      expect(r).toEqual({ cmd: 'claude --add-dir "C:\\Pessoas\\Maria Silva\\x" "diz \\"oi\\""', args: [], shell: true });
+    }
   });
   it("no Windows põe aspas em argumentos com & | < > ^ % ( ) (o cmd.exe interpreta esses caracteres)", () => {
     for (const c of comandos) {
       const args = ["a&b", "a|b", "a<b", "a>b", "a^b", "50%", "(x)", "simples"];
-      expect(c("npm", args, "win32").args).toEqual(['"a&b"', '"a|b"', '"a<b"', '"a>b"', '"a^b"', '"50%"', '"(x)"', "simples"]);
+      expect(c("npm", args, "win32").cmd).toBe('npm "a&b" "a|b" "a<b" "a>b" "a^b" "50%" "(x)" simples');
     }
   });
   it("no Windows não mexe em binário com caminho absoluto .exe", () => {

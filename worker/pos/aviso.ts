@@ -1,5 +1,5 @@
 import fs from "node:fs"; import path from "node:path";
-import { dirMarca } from "@/lib/caminhos"; import { rodarPython } from "@/lib/plataforma";
+import { dirMarca } from "@/lib/caminhos"; import { rodarPython } from "@/lib/plataforma"; import { renomear } from "@/lib/estado";
 
 /**
  * Reescreve o aviso legal oficial da marca por código, no lugar do parágrafo que a IA escreveu (a IA erra letras).
@@ -13,7 +13,7 @@ export async function aplicarAviso(arq: string, marca: string): Promise<boolean>
   const tmp = `${arq}.aviso.png`;
   try {
     await rodarPython("motor-flow/aviso_oficial.py", [arq, tmp, "--texto-arq", ident, "--fonte", path.join(fontes, fonte)], { timeout: 60_000 });
-    fs.renameSync(tmp, arq); return true;
+    renomear(tmp, arq); return true;
   } catch {
     fs.rmSync(tmp, { force: true }); return false; // exit 2 = sem aviso localizado; qualquer erro mantém a arte intacta
   }

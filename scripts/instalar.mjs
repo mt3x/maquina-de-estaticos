@@ -7,7 +7,7 @@ const em = (...p) => path.join(raiz, ...p);
 function rodar(etapa, bin, args) {
   const c = comandoSpawn(bin, args);
   const r = spawnSync(c.cmd, c.args, { stdio: "inherit", shell: c.shell, cwd: raiz });
-  if (r.status !== 0) { console.error(`❌ ${etapa} falhou${r.error ? ` (${r.error.message})` : ""}`); process.exit(1); }
+  if (r.status !== 0) { console.error(`❌ ${etapa} falhou${r.error ? ` (${r.error.message})` : ""}. Rode npm run instalar de novo; se falhar outra vez, mostre as últimas linhas acima ao Claude.`); process.exit(1); }
 }
 
 // 1. Ambiente Python (.venv) + dependências. Pronto = existe o Python do .venv; .venv meio criado é apagado e refeito.
@@ -18,7 +18,7 @@ else {
   if (fs.existsSync(em(".venv"))) { console.log("… Ambiente Python (.venv) incompleto: refazendo"); fs.rmSync(em(".venv"), { recursive: true, force: true }); }
   rodar("Ambiente Python (.venv)", py.cmd, [...py.args, "-m", "venv", ".venv"]); console.log("✅ Ambiente Python (.venv) feito");
 }
-rodar("Dependências do Python", pythonBin({ raiz }), ["-m", "pip", "install", "-r", "requirements.txt"]); console.log("✅ Dependências do Python feito");
+rodar("Dependências do Python", pythonBin({ raiz }), ["-m", "pip", "install", "--prefer-binary", "-r", "requirements.txt"]); console.log("✅ Dependências do Python feito");
 
 // 2. npm install (só se faltar node_modules ou o package-lock.json mudou)
 const mtime = (p) => { try { return fs.statSync(p).mtimeMs; } catch { return 0; } };

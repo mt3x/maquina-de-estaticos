@@ -1,5 +1,6 @@
 import fs from "node:fs"; import path from "node:path";
 import sharp from "sharp";
+sharp.cache(false); // no Windows o cache mantém os arquivos abertos
 import { dirMarca } from "@/lib/caminhos";
 import { lerJson, salvarJson } from "@/lib/estado";
 import type { Comando } from "@/lib/tipos";

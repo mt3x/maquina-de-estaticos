@@ -3,7 +3,7 @@ import fs from "node:fs"; import path from "node:path";
 import sharp from "sharp";
 vi.mock("@/lib/docx", () => ({ textoDocx: vi.fn(async () => "R60 - AD-01\nREF: ref-01\nCopy: Copy um") }));
 import { ambiente, remessaImportada, depsFalsas } from "./helpers";
-import { interpretarRemessa, confirmarRemessa, escreverPrompts, enviarReferencias, processarProximaArte, aplicarAjuste, aplicarControle, recuperarAoIniciar } from "@/worker/remessa";
+import { interpretarRemessa, confirmarRemessa, escreverPrompts, enviarReferencias, processarProximaArte, aplicarAjuste, aplicarControle, recuperarAoIniciar, chaveUpload } from "@/worker/remessa";
 import { lerRemessa, salvarRemessa, lerJson } from "@/lib/estado";
 import { arqEntrega, raizDados } from "@/lib/caminhos";
 
@@ -181,5 +181,77 @@ describe("rodada de correções", () => {
     await ateGerando(["nano-banana-2-1"], deps);
     for (let i = 0; i < 3; i++) await processarProximaArte(deps);
     expect(fs.existsSync(path.join(raizDados(), "remessas/R61/.interno/versoes/AD01-nano-banana-2-1-STORY/v1-t1.png"))).toBe(true);
+  });
+});
+
+describe("revisão de 11/10: casos que travavam alunos", () => {
+  const semLogo = () => fs.rmSync(path.join(raizDados(), "marcas/marca-teste/logo"), { recursive: true, force: true });
+  it("marca sem logo: o cérebro é avisado do arquivo que falta e refaz o prompt", async () => {
+    remessaImportada("R61"); semLogo(); const deps = await depsFalsas();
+    let n = 0;
+    (deps.cerebro.escreverPrompt as any) = vi.fn(async (o: any) => ({ prompt: "P ".repeat(150), ingredientes: n++ % 2 === 0 ? ["entrada:ref-01.jpg", "marca:logo/logo-cor.png"] : ["entrada:ref-01.jpg"] }));
+    await ateGerando(["nano-banana-2-1"], deps);
+    const r = lerRemessa("R61");
+    expect(r.etapa).toBe("gerando");
+    expect((deps.cerebro.escreverPrompt as any).mock.calls[1][0].aviso).toMatch(/marca:logo\/logo-cor\.png/);
+    expect(deps.flow.subir).toHaveBeenCalledTimes(1);
+  });
+  it("ingrediente que continua faltando para a remessa com erro do cérebro (sem tocar no Flow)", async () => {
+    remessaImportada("R61"); semLogo(); const deps = await depsFalsas();
+    await interpretarRemessa("R61", deps);
+    confirmarRemessa({ id: "c", ts: "", tipo: "confirmar", remessa: "R61", modelos: ["nano-banana-2-1"], anuncios: [{ id: "AD01", copy: "Copy um", instrucoes: "", temPessoas: true, apoio: [] }] });
+    await escreverPrompts("R61", deps); // o ciclo só envia referências em enviando_referencias
+    const r = lerRemessa("R61");
+    expect(r.etapa).toBe("erro"); expect(r.erro?.tipo).toBe("cerebro"); expect(r.erro?.msg).toMatch(/não existem/);
+    expect(deps.flow.subir).not.toHaveBeenCalled();
+  });
+  it("trocar de projeto do Flow sobe os ingredientes de novo", async () => {
+    remessaImportada("R61"); const deps = await depsFalsas();
+    await ateGerando(["nano-banana-2-1"], deps);
+    expect(deps.flow.subir).toHaveBeenCalledTimes(2);
+    expect(lerJson<Record<string, string>>(path.join(raizDados(), "flow-uploads.json"))[chaveUpload("r61-ref-01.jpg")]).toBeTruthy();
+    process.env.FLOW_PROJETO = "11111111-2222-4333-8444-555555555555";
+    await enviarReferencias("R61", deps, false);
+    expect(deps.flow.subir).toHaveBeenCalledTimes(4);
+  });
+  it("erro no acabamento (selo/Python) não gera de novo no Flow", async () => {
+    remessaImportada("R61"); const deps = await depsFalsas();
+    (deps.pos.aplicarSelo as any) = vi.fn(async () => { throw new Error("python quebrou"); });
+    await ateGerando(["nano-banana-2-1"], deps);
+    await processarProximaArte(deps);
+    let r = lerRemessa("R61");
+    expect(r.anuncios[0].artes[0].status).toBe("falhou"); expect(r.etapa).toBe("erro");
+    expect(r.anuncios[0].artes[0].erro).toMatch(/acabamento/);
+    await aplicarControle({ id: "x", ts: "", tipo: "retomar", remessa: "R61" });
+    await processarProximaArte(deps);
+    r = lerRemessa("R61");
+    expect(r.anuncios[0].artes[0].status).toBe("falhou");
+    expect(deps.flow.gerar).toHaveBeenCalledTimes(2); // 1 por formato, nenhuma repetição
+  });
+  it("ajuste cujo acabamento falha ao entrar em entrega/ devolve a versão anterior", async () => {
+    remessaImportada("R61"); const deps = await depsFalsas();
+    await ateGerando(["nano-banana-2-1"], deps);
+    await processarProximaArte(deps); await processarProximaArte(deps);
+    await aplicarAjuste({ id: "a", ts: "", tipo: "ajuste", remessa: "R61", anuncio: "AD01", formato: "STORY", modelo: "nano-banana-2-1", escopo: "formato", texto: "x" }, deps);
+    const entrega = arqEntrega("R61", "AD01", "nano-banana-2-1", "STORY"); const antes = fs.readFileSync(entrega);
+    const real = fs.renameSync;
+    const spy = vi.spyOn(fs, "renameSync").mockImplementation((a, b) => { if (String(a).includes(`${path.sep}pos${path.sep}`) && b === entrega) throw Object.assign(new Error("disco"), { code: "EIO" }); real(a, b); });
+    try { await processarProximaArte(deps); } finally { spy.mockRestore(); }
+    expect(fs.readFileSync(entrega).equals(antes)).toBe(true);
+    expect(lerRemessa("R61").anuncios[0].artes[0]).toMatchObject({ status: "pronta", versaoAtual: 1 });
+  });
+  it("falha só na miniatura não descarta a arte entregue", async () => {
+    remessaImportada("R61"); const deps = await depsFalsas();
+    (deps.pos.miniatura as any) = vi.fn(async () => { throw new Error("webp quebrou"); });
+    await ateGerando(["nano-banana-2-1"], deps);
+    await processarProximaArte(deps);
+    const a = lerRemessa("R61").anuncios[0].artes[0];
+    expect(a.status).toBe("pronta"); expect(a.miniatura).toBeUndefined(); expect(fs.existsSync(a.arquivo!)).toBe(true);
+  });
+  it("apoio enviado com nome original tira a dúvida que citava esse nome", async () => {
+    const r0 = remessaImportada("R61"); r0.anuncios = [{ id: "AD01", ref: "ref-01.jpg", copy: "c", instrucoes: "", apoio: [], temPessoas: false, artes: [] } as any];
+    r0.duvidas = [{ id: "d1", anuncio: "AD01", pergunta: "Falta o arquivo Foto do Produto.PNG citado no docx" }]; salvarRemessa(r0);
+    await aplicarControle({ id: "x", ts: "", tipo: "apoio", remessa: "R61", anuncio: "AD01", arquivo: "apoio/foto-do-produto.png", nomeOriginal: "Foto do Produto.PNG" });
+    expect(lerRemessa("R61").duvidas).toEqual([]);
   });
 });

@@ -12,6 +12,7 @@ function rodar(script: string, args: string[], timeoutMs: number): Promise<{ cod
       env: { ...process.env, NODE_PATH: path.join(process.cwd(), "node_modules") }, stdio: ["ignore", "pipe", "pipe"] });
     let out = "";
     const t = setTimeout(() => p.kill("SIGKILL"), timeoutMs);
+    p.stdout.setEncoding("utf8"); p.stderr.setEncoding("utf8");
     p.stdout.on("data", (d) => (out += d)); p.stderr.on("data", (d) => (out += d));
     p.on("close", (code) => { clearTimeout(t); resolve({ code: code ?? 1, out }); });
   });
@@ -24,13 +25,14 @@ export class ErroBloqueioFlow extends Error { constructor(msg: string) { super(m
 
 export const numeroSaldo = (v?: string | number) => v === undefined || v === null ? undefined : Number(String(v).replace(/[^\d]/g, "")) || undefined;
 
-export function classificar(code: number, rec: any, formato: Formato, destino: string): ResultadoGeracao {
+/** `nomes`: nomes de arquivo da geração, tirados do erro antes de procurar 403/429 (uma remessa "R403" não é bloqueio). */
+export function classificar(code: number, rec: any, formato: Formato, destino: string, nomes: string[] = []): ResultadoGeracao {
   const base = { mediaId: rec?.media_id, segundos: rec?.seconds, creditos: rec?.cost_n ?? undefined,
     saldo: numeroSaldo(rec?.credits_after?.value), largura: rec?.width, altura: rec?.height, msg: rec?.error ?? undefined };
   const err = String(rec?.error ?? "");
   // custo > 0 nunca pode passar, nem se o driver sair 0 por engano (defesa extra).
   if (code === 3 || (typeof rec?.cost_n === "number" && rec.cost_n > 0)) return { ...base, status: "custo", msg: base.msg ?? `custo ${rec?.cost_n} na UI do Flow` };
-  if (REGEX_BLOQUEIO.test(err)) return { ...base, status: "bloqueio" };
+  if (REGEX_BLOQUEIO.test([...nomes, destino].filter(Boolean).reduce((t, n) => t.split(n).join(""), err))) return { ...base, status: "bloqueio" };
   if (/^UI: Failed/.test(err)) return { ...base, status: "falha_leve" };
   if (/Timeout \d+ms exceeded|locator\./.test(err)) return { ...base, status: "ui" };
   if (code !== 0 || err || !fs.existsSync(destino)) return { ...base, status: "erro", msg: err || `driver saiu ${code}` };
@@ -45,7 +47,7 @@ export async function gerar(o: { modelo: ModeloId; formato: Formato; promptArq: 
   const { code, out } = await rodar("gen.js", args, 12 * 60_000);
   const linha = out.split("\n").reverse().find((l) => l.startsWith("RESULT "));
   let rec: any = {}; try { rec = linha ? JSON.parse(linha.slice(7)) : { error: `sem RESULT: ${out.slice(-300)}` }; } catch { rec = { error: "RESULT ilegível" }; }
-  return classificar(code, rec, o.formato, o.destino);
+  return classificar(code, rec, o.formato, o.destino, [...o.ingredientes, path.basename(o.destino)]);
 }
 
 export async function subir(arquivoAbs: string, nomeFlow: string) {

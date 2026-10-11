@@ -14,5 +14,11 @@ describe("chrome.js", () => {
     const win = path.win32.join("C:\\Program Files", "Google", "Chrome", "Application", "chrome.exe");
     expect(resolveChromePath("win32", (p: string) => p === win, { PROGRAMFILES: "C:\\Program Files" })).toBe(win);
   });
+  it("acha o Chrome em ~/Applications e respeita FLOW_CHROME_PATH", () => {
+    const user = "/casa/ana/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+    expect(resolveChromePath("darwin", (p: string) => p === user, { HOME: "/casa/ana" })).toBe(user);
+    expect(resolveChromePath("win32", (p: string) => p === "D:\\Chrome\\chrome.exe", { FLOW_CHROME_PATH: "D:\\Chrome\\chrome.exe" })).toBe("D:\\Chrome\\chrome.exe");
+    expect(resolveChromePath("win32", () => false, { FLOW_CHROME_PATH: "D:\\nao\\existe.exe" })).toBeNull();
+  });
   it("devolve null sem Chrome", () => { expect(resolveChromePath("darwin", () => false, {})).toBeNull(); });
 });

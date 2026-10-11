@@ -68,3 +68,11 @@ describe("flow-driver", () => {
   });
   it("numeroSaldo", () => { expect(numeroSaldo("6,935")).toBe(6935); expect(numeroSaldo(undefined)).toBeUndefined(); });
 });
+
+describe("classificar: nomes de arquivo não disparam bloqueio", () => {
+  it("R403 no nome do ingrediente não é bloqueio; 403 de verdade é", () => {
+    const destino = path.join(os.tmpdir(), "nao-existe.png");
+    expect(classificar(1, { error: "ingrediente r403-ref-01.jpg não encontrado no picker" }, "STORY", destino, ["r403-ref-01.jpg"]).status).not.toBe("bloqueio");
+    expect(classificar(1, { error: "HTTP 403 em r403-ref-01.jpg" }, "STORY", destino, ["r403-ref-01.jpg"]).status).toBe("bloqueio");
+  });
+});

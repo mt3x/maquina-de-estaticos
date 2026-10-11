@@ -16,15 +16,23 @@ import { atualizarStatus, lerBloqueio, lerStatus, desbloquear } from "./status";
 import { interpretarRemessa, confirmarRemessa, escreverPrompts, enviarReferencias, processarProximaArte, aplicarAjuste, aplicarControle, recuperarAoIniciar, type Deps } from "./remessa";
 
 const dormir = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const num = (v: string | undefined, padrao: number) => { const n = Number(v); return v && Number.isFinite(n) ? n : padrao; };
+/** Travas da conta do Flow: o .env.local pode deixar mais lento, nunca mais rápido (pausa >= 45 s, máx. 3 tentativas). */
+export function limitesFlow(env: Record<string, string | undefined> = process.env) {
+  const minS = Math.max(45, num(env.PAUSA_MIN_S, 45)); const maxS = Math.max(minS, num(env.PAUSA_MAX_S, 60));
+  const maxTentativas = Math.min(3, Math.max(1, Math.floor(num(env.MAX_TENTATIVAS, 3))));
+  return { minS, maxS, maxTentativas };
+}
 
 export function criarDeps(): Deps {
   const s = lerStatus();
   const ultimoFimInicial = Math.max(s.ultimoFim ?? 0, s.ultimoEnvio ?? 0) || null;
+  const lim = limitesFlow();
   const deps: Deps = {
     cerebro: tarefas, flow: driver, pos: { finalizar, miniatura, aplicarSelo, aplicarAviso },
-    ritmo: new Ritmo({ dormir, agora: () => Date.now(), aleatorio: Math.random, minS: Number(process.env.PAUSA_MIN_S || 45), maxS: Number(process.env.PAUSA_MAX_S || 60),
+    ritmo: new Ritmo({ dormir, agora: () => Date.now(), aleatorio: Math.random, minS: lim.minS, maxS: lim.maxS,
       ultimoFimInicial, aoRegistrarFim: (ms) => atualizarStatus({ ultimoFim: ms }) }),
-    dormir, maxTentativas: Number(process.env.MAX_TENTATIVAS || 3),
+    dormir, maxTentativas: lim.maxTentativas,
   };
   deps.aplicarPendentes = () => processarComandos(deps);
   return deps;

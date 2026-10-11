@@ -46,7 +46,7 @@ export function checarPython(rodar, plataforma = process.platform) {
 export function checarChrome(resolver = resolveChromePath, plataforma = process.platform) {
   const caminho = resolver();
   if (caminho) return { id: "chrome", ok: true, detalhe: `Google Chrome em ${caminho}` };
-  return { id: "chrome", ok: false, detalhe: "Google Chrome não encontrado",
+  return { id: "chrome", ok: false, detalhe: "Google Chrome não encontrado (se ele já está instalado em outro lugar, ponha o caminho do programa em FLOW_CHROME_PATH no .env.local)",
     comoResolver: mac(plataforma) ? "brew install --cask google-chrome" : winget("Google.Chrome") };
 }
 
@@ -71,7 +71,7 @@ export function checarClaude(rodar) {
 const aspas = (a) => (/[\s"&|<>^%()]/.test(a) ? `"${a.replace(/"/g, '\\"')}"` : a);
 export function comandoSpawn(bin, args, plataforma = process.platform) {
   if (plataforma !== "win32" || /\.exe$/i.test(bin)) return { cmd: bin, args, shell: false };
-  return { cmd: bin, args: args.map(aspas), shell: true };
+  return { cmd: [bin, ...args.map(aspas)].join(" "), args: [], shell: true }; // linha única: o Node 24 avisa (DEP0190) se args vierem com shell
 }
 // turbopackIgnore: o app importa este arquivo (e o chrome.js); sem a marca o Turbopack segue o .venv e quebra o build.
 export function pythonBin(o = {}) {
