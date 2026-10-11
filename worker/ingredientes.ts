@@ -10,7 +10,7 @@ function confinar(base: string, rel: string, token: string): string {
 
 export function resolverIngrediente(token: string, remessa: string, marca: string) {
   const [tipo, ...resto] = token.split(":"); const rel = resto.join(":");
-  if (tipo === "entrada") return { abs: confinar(dirEntrada(remessa), rel, token), nomeFlow: `${remessa.toLowerCase()}-${rel.replace(/\//g, "-")}` };
+  if (tipo === "entrada") return { abs: confinar(dirEntrada(remessa), rel, token), nomeFlow: `${remessa.toLowerCase()}-${rel.replace(/[\\/]/g, "-")}` };
   if (tipo === "marca") return { abs: confinar(dirMarca(marca), rel, token), nomeFlow: `${marca}-${path.basename(rel)}` };
   throw new Error(`ingrediente inválido: ${token}`);
 }

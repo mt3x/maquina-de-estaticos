@@ -101,7 +101,8 @@ describe("api", () => {
     await remessaPronta(["nano-banana-2-1"]);
     const mk = (ad: string) => { const fd = new FormData(); fd.append("arquivo", new File(["a"], "doc.pdf")); fd.append("anuncio", ad); return new Request("http://127.0.0.1:3200/x", { method: "POST", body: fd }); };
     const ok = await apoio(mk("AD01"), ctx("R61")); expect(ok.status).toBe(200);
-    expect(fs.existsSync(path.join(dados, "remessas/R61/entrada/apoio", (await ok.json()).arquivo.split("/").pop()))).toBe(true);
+    const { arquivo } = await ok.json(); expect(arquivo).toBe("apoio/doc.pdf");
+    expect(fs.existsSync(path.join(dados, "remessas/R61/entrada/apoio", arquivo.split("/").pop()))).toBe(true);
     expect((await apoio(mk("ZZ"), ctx("R61"))).status).toBe(400);
     expect((await apoio(mk("AD01"), ctx("R99"))).status).toBe(404);
     expect(fs.existsSync(path.join(dados, "remessas/R99"))).toBe(false);

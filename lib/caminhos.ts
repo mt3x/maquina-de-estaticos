@@ -18,6 +18,9 @@ export const dirInternoPrompts = (id: string) => path.join(dirInterno(id), "prom
 /** JSON `{prompt, ingredientes}` da versão `v` de uma arte (o .txt irmão é o que vai ao Flow). */
 export const arqPrompt = (id: string, ad: string, f: Formato, m: ModeloId, v: number) => path.join(dirInternoPrompts(id), `${ad}-${f}-${m}-v${v}.json`);
 
+/** Caminho relativo guardado/trocado com o modelo e a API: sempre com `/`, em qualquer sistema. */
+export const paraPosix = (p: string) => p.replace(/\\/g, "/");
+
 /** true se `alvo` (resolvido) está dentro de `base` — guarda contra path traversal. */
 export function dentroDe(base: string, alvo: string): boolean {
   const b = path.resolve(base) + path.sep;

@@ -1,6 +1,6 @@
 import fs from "node:fs"; import path from "node:path"; import crypto from "node:crypto";
 import { lerRemessa, salvarRemessa, registrar, listarRemessas, lerJson, salvarJson } from "@/lib/estado";
-import { dirEntrada, dirInterno, arqEntrega, arqUploads, raizDados, arqPrompt } from "@/lib/caminhos";
+import { dirEntrada, dirInterno, arqEntrega, arqUploads, raizDados, arqPrompt, paraPosix } from "@/lib/caminhos";
 import { criarArtes, FORMATOS, type Arte, type Comando, type Formato, type ModeloId, type Remessa } from "@/lib/tipos";
 import { textoDocx } from "@/lib/docx";
 import { acharDocx, acharRefs } from "@/lib/nomes";
@@ -30,7 +30,7 @@ const txtDe = (json: string) => json.replace(/\.json$/, ".txt");
 function gravarPrompt(arq: string, p: { prompt: string; ingredientes: string[] }) { salvarJson(arq, p); fs.writeFileSync(txtDe(arq), p.prompt); }
 function listarArquivos(base: string, rel = ""): string[] {
   if (!fs.existsSync(path.join(base, rel))) return [];
-  return fs.readdirSync(path.join(base, rel), { withFileTypes: true }).flatMap((e) => e.isDirectory() ? listarArquivos(base, path.join(rel, e.name)) : [path.join(rel, e.name)]);
+  return fs.readdirSync(path.join(base, rel), { withFileTypes: true }).flatMap((e) => e.isDirectory() ? listarArquivos(base, paraPosix(path.join(rel, e.name))) : [paraPosix(path.join(rel, e.name))]);
 }
 const arteDe = (r: Remessa, a: { anuncio: string; formato: Formato; modelo: ModeloId }) =>
   r.anuncios.find((x) => x.id === a.anuncio)!.artes.find((x) => x.formato === a.formato && x.modelo === a.modelo)!;
